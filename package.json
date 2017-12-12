@@ -2,17 +2,21 @@
   "name": "basic-electron-react-boilerplate",
   "version": "0.7.0",
   "description": "Minimal and modern react+electron+webpack boilerplate",
-  "author": "Phillip Barbiero",
-  "homepage": "https://github.com/pbarbiero/basic-electron-react-boilerplate",
+  "author": "Keith Weaver",
+  "homepage": "https://github.com/keithweaver/basic-electron-react-boilerplate",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pbarbiero/basic-electron-react-boilerplate.git"
+    "url": "https://github.com/keithweaver/basic-electron-react-boilerplate.git"
   },
+  "contributors": [
+    "Phillip Barbiero <https://github.com/pbarbiero>",
+    "Keith Weaver <https://github.com/keithweaver>"
+  ],
   "license": "MIT",
   "main": "main.js",
   "scripts": {
     "prod": "webpack --config webpack.build.config.js && electron --noDevServer .",
-    "dev": "webpack-dev-server --hot --host 0.0.0.0 --config=./webpack.dev.config.js",
+    "dev": "webpack-dev-server --hot --host 0.0.0.0 --port 4000 --config=./webpack.dev.config.js",
     "build": "webpack --config webpack.build.config.js",
     "package": "webpack --config webpack.build.config.js",
     "postpackage": "electron-packager ./ --out=./builds"
