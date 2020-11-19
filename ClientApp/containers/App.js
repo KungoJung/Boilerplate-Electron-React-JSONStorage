@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 
-import '../assets/css/App.css';
-
-import HelloWorld from '../components/App/HelloWorld';
+import Routes from '../components/App/Routes';
 
 class App extends Component {
   render() {
     return (
       <div>
-        <HelloWorld />
+        <Routes />
       </div>
     );
   }

@@ -1,20 +1,14 @@
 {
-  "name": "basic-electron-react-boilerplate",
+  "name": "expense-tracker-electron",
   "version": "0.7.0",
-  "description": "Minimal and modern react+electron+webpack boilerplate",
-  "author": "Keith Weaver",
-  "homepage": "https://github.com/keithweaver/basic-electron-react-boilerplate",
+  "description": "Expense Tracker Stackathon Project using Electron.js D3 and React Hooks",
+  "author": "Danny Berger",
+  "homepage": "https://github.com/KungoJung/expense-tracker-electron",
   "repository": {
     "type": "git",
-    "url": "https://github.com/keithweaver/basic-electron-react-boilerplate.git"
+    "url": "https://github.com/KungoJung/expense-tracker-electron.git"
   },
-  "contributors": [
-    "Phillip Barbiero <https://github.com/pbarbiero>",
-    "Keith Weaver <https://github.com/keithweaver>",
-    "Denys Dovhan <https://github.com/denysdovhan>",
-    "Willy Ovalle <https://github.com/wovalle>"
-  ],
-  "license": "MIT",
+  "license": "none",
   "main": "main.js",
   "scripts": {
     "prod": "webpack --config webpack.build.config.js && electron --noDevServer .",
@@ -34,10 +28,14 @@
     "extract-text-webpack-plugin": "^3.0.1",
     "file-loader": "^1.1.5",
     "html-webpack-plugin": "^2.28.0",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "style-loader": "^0.19.0",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.4.5"
+  },
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "react-bootstrap": "^1.0.0-beta.9"
   }
 }

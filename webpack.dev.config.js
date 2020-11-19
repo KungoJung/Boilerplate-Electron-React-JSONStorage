@@ -6,7 +6,7 @@ const helpers = require('./config/helpers');
 
 
 // Config directories
-const SRC_DIR = path.resolve(__dirname, 'src');
+const SRC_DIR = path.resolve(__dirname, 'ClientApp');
 const OUTPUT_DIR = path.resolve(__dirname, 'dist');
 
 // Any directories you will be adding code/files into, need to be added to this array so webpack will pick them up
