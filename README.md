@@ -4,7 +4,7 @@
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 
-From the Boilerplate Code (Electron-React App)
+From the Boilerplate Repo (Electron-React App)
 
 _Electron, React, Webpack -- Modern and up-to-date, with a handful of quality of life features included_
 
