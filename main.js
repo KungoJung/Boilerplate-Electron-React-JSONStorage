@@ -1,7 +1,7 @@
 'use strict';
 
 // Import parts of electron to use
-const {app, BrowserWindow} = require('electron');
+const {app, ipcMain, BrowserWindow} = require('electron');
 const path = require('path')
 const url = require('url')
 
@@ -18,7 +18,7 @@ if ( process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) 
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1024, height: 768, show: false
+    width: 1024, height: 768, show: false, icon: __dirname + "/public/Lobster.icns"
   });
 
   // and load the index.html of the app.
@@ -47,6 +47,8 @@ function createWindow() {
       mainWindow.webContents.openDevTools();
     }
   });
+
+  mainWindow.webContents.send("info", {msg: "hello from main process"})
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
@@ -78,3 +80,11 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+// Main receives a message from renderer
+ipcMain.on("key_on_message", (event, data) => {
+  console.log("ipcMain Message On Main:")
+  console.log(data)
+  // main sends a response back to renderer
+  mainWindow.send("send_to_renderer", "pong")
+})
