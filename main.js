@@ -1,19 +1,28 @@
 'use strict';
 
 // Import parts of electron to use
-const {app, ipcMain, BrowserWindow} = require('electron');
+const {app, Menu, ipcMain, BrowserWindow, shell} = require('electron');
 const path = require('path')
 const url = require('url')
+const {HANDLE_FETCH_TEXT, FETCH_TEXT_FROM_STORAGE, HANDLE_SAVE_TEXT, SAVE_TEXT_IN_STORAGE} = require("./utils/constants")
+const storage = require("electron-json-storage")
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+
+// A reference to the expenses array, full of JS/JSON objects. All mutations to the array are performed in the main.js app, but each mutation will trigger a rewrite to the user's storage for data persistence
+let expenses;
 
 // Keep a reference for dev mode
 let dev = false;
 if ( process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath) ) {
   dev = true;
 }
+
+// Keep a reference to the default path to userData, which will act as the app's database. It may not be necessary to use this
+const defaultDataPath = storage.getDefaultDataPath();
+// On Mac: /Users/[username]/Library/Application Support/expense-tracker-electron/storage
 
 function createWindow() {
   // Create the browser window.
@@ -57,7 +66,46 @@ function createWindow() {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
+  // Creates a Menu instance (optional)
+  // const menu = Menu.buildFromTemplate([
+  //   {
+  //     label: 'Track',
+  //     submenu: [
+  //       {label: "Current Month"},
+  //       {label: "Past 6 Months"},
+  //       {label: "Past Year"},
+  //       {type: "separator"},
+  //       {
+  //         label: "Link: Monefy",
+  //         click() {
+  //           shell.openExternal('https://monefy.me/')
+  //         }
+  //       },
+  //       {type: "separator"},
+  //       {
+  //         label: "Exit",
+  //         click() {
+  //           app.quit()
+  //         }
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     label: "Info",
+  //     submenu: [
+  //       {label: "this"},
+  //       {label: "that"},
+  //     ]
+  //   }
+  // ])
+//
+  // Appends the menu to the application
+//   Menu.setApplicationMenu(menu)
 }
+// End createWindow() ---------------------------------------------------
+
+// Application boot up and boot down
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -79,12 +127,77 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
+
+
 });
 
-// Main receives a message from renderer
+// --------------------------------------------------------------
+
+// ipcMain methods are how we interact between the window and (this) main program
+
+// Sample -- main receives a message from window
 ipcMain.on("key_on_message", (event, data) => {
   console.log("ipcMain Message On Main:")
   console.log(data)
   // main sends a response back to renderer
   mainWindow.send("send_to_renderer", "pong")
 })
+
+ipcMain.on(FETCH_TEXT_FROM_STORAGE, (event, message) => {
+  // Get the user's expenses from storage
+  // For our purposes, message = "expenses"
+  console.log(message)
+  storage.get(message, function (error, data) {
+
+    // if the expenses key does not yet exist in storage, data returns an empty object, so we will declare expenses to be an empty array
+    expenses = JSON.stringify(data) === '{}' ? [] : data;
+
+    if (error) {
+      mainWindow.send(HANDLE_FETCH_TEXT, {
+        success: false,
+        message: "expenses not returned",
+        text: savedText
+      })
+    } else {
+      console.log("data returned from storage.get('expenses'):", expenses)
+      // Send message back to window
+      mainWindow.send(HANDLE_FETCH_TEXT, {
+        success: true,
+        message: expenses, // do something with the data
+        text: "hmm"
+      })
+    }
+  })
+
+})
+
+// Receive a SAVE_TEXT_IN_STORAGE call from renderer
+ipcMain.on(SAVE_TEXT_IN_STORAGE, (event, message) => {
+  console.log("main received", SAVE_TEXT_IN_STORAGE + ":")
+  console.log("message:", message)
+
+  // update the expenses array.
+  expenses.push(message)
+  console.log("Expenses after updating:", expenses)
+
+  // Save expenses to storage
+  storage.set("expenses", expenses, (error) => {
+
+    if (error) {
+      console.log("We errored! What was data?")
+      mainWindow.send(HANDLE_SAVE_TEXT, {
+        success: false,
+        message: "expenses not saved",
+        text: savedText
+      })
+    }
+  })
+
+  // Send message back to window as 2nd arg "data"
+  mainWindow.send(HANDLE_SAVE_TEXT, {
+    success: true,
+    message: message,
+    text: "hi"
+  })
+});
+

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import Button from 'react-bootstrap/Button';
 // import ButtonToolbar from 'react-bootstrap/ButtonToolbar';
-import {sendMessageToMain } from "../../../renderer.js"
+import {sendMessageToMain} from "../renderer.js"
 import Persist from "./Persist"
 const { ipcRenderer } = require("electron");
 
