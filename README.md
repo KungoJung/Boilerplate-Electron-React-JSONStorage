@@ -1,4 +1,11 @@
-# Modern and Minimal Electron + React Starter Kit
+# Electron Expense Tracker
+
+### Stackathon Project exploring Electron, Bootstrap, and D3
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+From the Boilerplate Repo (Electron-React App)
+
 _Electron, React, Webpack -- Modern and up-to-date, with a handful of quality of life features included_
 
 I made this starter kit as most boilerplates were either out-of-date, heavy handed, or enforced a structure on me that I just didnt like.
