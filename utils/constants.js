@@ -1,6 +1,6 @@
 module.exports = {
-  HANDLE_FETCH_TEXT: 'handle-fetch-text',
-  FETCH_TEXT_FROM_STORAGE: 'fetch-text-from-storage',
-  HANDLE_SAVE_TEXT: 'handle-save-text',
-  SAVE_TEXT_IN_STORAGE: 'save-text-in-storage',
+  HANDLE_FETCH_DATA: 'handle-fetch-data',
+  FETCH_DATA_FROM_STORAGE: 'fetch-data-from-storage',
+  HANDLE_SAVE_DATA: 'handle-save-data',
+  SAVE_DATA_IN_STORAGE: 'save-data-in-storage',
 }

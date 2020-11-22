@@ -1,10 +1,10 @@
 'use strict';
 
 // Import parts of electron to use
-const {app, Menu, ipcMain, BrowserWindow, shell} = require('electron');
+const { app, Menu, ipcMain, BrowserWindow } = require('electron');
 const path = require('path')
 const url = require('url')
-const {HANDLE_FETCH_TEXT, FETCH_TEXT_FROM_STORAGE, HANDLE_SAVE_TEXT, SAVE_TEXT_IN_STORAGE} = require("./utils/constants")
+const {HANDLE_FETCH_DATA, FETCH_DATA_FROM_STORAGE, HANDLE_SAVE_DATA, SAVE_DATA_IN_STORAGE} = require("./utils/constants")
 const storage = require("electron-json-storage")
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -127,77 +127,58 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
-
-
 });
 
 // --------------------------------------------------------------
 
 // ipcMain methods are how we interact between the window and (this) main program
 
-// Sample -- main receives a message from window
-ipcMain.on("key_on_message", (event, data) => {
-  console.log("ipcMain Message On Main:")
-  console.log(data)
-  // main sends a response back to renderer
-  mainWindow.send("send_to_renderer", "pong")
-})
-
-ipcMain.on(FETCH_TEXT_FROM_STORAGE, (event, message) => {
+// Receives a FETCH_DATA_FROM_STORAGE from renderer
+ipcMain.on(FETCH_DATA_FROM_STORAGE, (event, message) => {
   // Get the user's expenses from storage
-  // For our purposes, message = "expenses"
-  console.log(message)
-  storage.get(message, function (error, data) {
-
+  // For our purposes, message = expenses array
+  storage.get(message, (error, data) => {
     // if the expenses key does not yet exist in storage, data returns an empty object, so we will declare expenses to be an empty array
     expenses = JSON.stringify(data) === '{}' ? [] : data;
 
     if (error) {
-      mainWindow.send(HANDLE_FETCH_TEXT, {
+      mainWindow.send(HANDLE_FETCH_DATA, {
         success: false,
         message: "expenses not returned",
-        text: savedText
       })
     } else {
-      console.log("data returned from storage.get('expenses'):", expenses)
       // Send message back to window
-      mainWindow.send(HANDLE_FETCH_TEXT, {
+      mainWindow.send(HANDLE_FETCH_DATA, {
         success: true,
         message: expenses, // do something with the data
-        text: "hmm"
       })
     }
   })
 
 })
 
-// Receive a SAVE_TEXT_IN_STORAGE call from renderer
-ipcMain.on(SAVE_TEXT_IN_STORAGE, (event, message) => {
-  console.log("main received", SAVE_TEXT_IN_STORAGE + ":")
-  console.log("message:", message)
+// Receive a SAVE_DATA_IN_STORAGE call from renderer
+ipcMain.on(SAVE_DATA_IN_STORAGE, (event, message) => {
+  console.log("main received", SAVE_DATA_IN_STORAGE + ": message:", message)
 
   // update the expenses array.
   expenses.push(message)
-  console.log("Expenses after updating:", expenses)
 
   // Save expenses to storage
   storage.set("expenses", expenses, (error) => {
-
     if (error) {
       console.log("We errored! What was data?")
-      mainWindow.send(HANDLE_SAVE_TEXT, {
+      mainWindow.send(HANDLE_SAVE_DATA, {
         success: false,
         message: "expenses not saved",
-        text: savedText
+      })
+    } else {
+      // Send message back to window as 2nd arg "data"
+      mainWindow.send(HANDLE_SAVE_DATA, {
+        success: true,
+        message: message,
       })
     }
-  })
-
-  // Send message back to window as 2nd arg "data"
-  mainWindow.send(HANDLE_SAVE_TEXT, {
-    success: true,
-    message: message,
-    text: "hi"
   })
 });
 
