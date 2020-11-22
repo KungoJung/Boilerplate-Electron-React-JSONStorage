@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import Button from 'react-bootstrap/Button';
+import InputGroup from "react-bootstrap/InputGroup";
 import {loadSavedData, saveDataInStorage} from "../renderer.js";
 import ExpensesList from "./ExpensesList";
 const { ipcRenderer } = require("electron");
@@ -10,9 +11,9 @@ const Home = () => {
   const [expenses, setExpenses] = useState([]);
 
   // Grab the user's saved expenses after the app loads
-  // useEffect(() => {
-  //   loadSavedData();
-  // });
+  useEffect(() => {
+    loadSavedData();
+  }, []);
 
   // Listener functions that receive messages from main
   useEffect(() => {
@@ -54,18 +55,19 @@ const Home = () => {
 
   return (
     <div>
-      <div>
-        <Button onClick={loadSavedData}>Load Expenses</Button>
-        {expenses.length ? (
-          <ExpensesList expenses={expenses} />
-        ) : (
-          <p>Add an expense to get started</p>
-        )}
-      </div>
-      <div>
-        <input type="text" onChange={handleChange} value={val}/>
-        <Button onClick={() => addExpense(val)}>Add a new expense</Button>
-      </div>
+      <InputGroup className="mb-3">
+        <InputGroup.Prepend>
+          <Button variant="outline-primary" onClick={() => addExpense(val)}>New expense</Button>
+        </InputGroup.Prepend>
+          <input type="text" onChange={handleChange} value={val}/>
+      </InputGroup>
+      {expenses.length ? (
+        <div id="expenses-container">
+        <ExpensesList expenses={expenses} />
+        </div>
+      ) : (
+        <p>Add an expense to get started</p>
+      )}
     </div>
   )
 }
