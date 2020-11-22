@@ -11,8 +11,8 @@ const storage = require("electron-json-storage")
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-// A reference to the expenses array, full of JS/JSON objects. All mutations to the array are performed in the main.js app, but each mutation will trigger a rewrite to the user's storage for data persistence
-let expenses;
+// A reference to the itemsToTrack array, full of JS/JSON objects. All mutations to the array are performed in the main.js app, but each mutation will trigger a rewrite to the user's storage for data persistence
+let itemsToTrack;
 
 // Keep a reference for dev mode
 let dev = false;
@@ -135,22 +135,22 @@ app.on('activate', () => {
 
 // Receives a FETCH_DATA_FROM_STORAGE from renderer
 ipcMain.on(FETCH_DATA_FROM_STORAGE, (event, message) => {
-  // Get the user's expenses from storage
-  // For our purposes, message = expenses array
+  // Get the user's itemsToTrack from storage
+  // For our purposes, message = itemsToTrack array
   storage.get(message, (error, data) => {
-    // if the expenses key does not yet exist in storage, data returns an empty object, so we will declare expenses to be an empty array
-    expenses = JSON.stringify(data) === '{}' ? [] : data;
+    // if the itemsToTrack key does not yet exist in storage, data returns an empty object, so we will declare itemsToTrack to be an empty array
+    itemsToTrack = JSON.stringify(data) === '{}' ? [] : data;
 
     if (error) {
       mainWindow.send(HANDLE_FETCH_DATA, {
         success: false,
-        message: "expenses not returned",
+        message: "itemsToTrack not returned",
       })
     } else {
       // Send message back to window
       mainWindow.send(HANDLE_FETCH_DATA, {
         success: true,
-        message: expenses, // do something with the data
+        message: itemsToTrack, // do something with the data
       })
     }
   })
@@ -161,16 +161,16 @@ ipcMain.on(FETCH_DATA_FROM_STORAGE, (event, message) => {
 ipcMain.on(SAVE_DATA_IN_STORAGE, (event, message) => {
   console.log("main received", SAVE_DATA_IN_STORAGE + ": message:", message)
 
-  // update the expenses array.
-  expenses.push(message)
+  // update the itemsToTrack array.
+  itemsToTrack.push(message)
 
-  // Save expenses to storage
-  storage.set("expenses", expenses, (error) => {
+  // Save itemsToTrack to storage
+  storage.set("itemsToTrack", itemsToTrack, (error) => {
     if (error) {
       console.log("We errored! What was data?")
       mainWindow.send(HANDLE_SAVE_DATA, {
         success: false,
-        message: "expenses not saved",
+        message: "itemsToTrack not saved",
       })
     } else {
       // Send message back to window as 2nd arg "data"

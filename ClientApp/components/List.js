@@ -2,22 +2,23 @@ import React from 'react';
 import Table from "react-bootstrap/Table"
 import Button from "react-bootstrap/Button";
 
-const ExpensesList = ({expenses}) => {
+const List = ({itemsToTrack}) => {
   return (
     <Table striped bordered hover>
       <thead>
         <tr>
           <th>#</th>
-          <th>Expense</th>
+          <th>Item</th>
         </tr>
       </thead>
       <tbody>
-        {expenses.map((item, i) => {
+        {itemsToTrack.map((item, i) => {
           return (
             <tr key={i+1}>
               <td>{i+1}</td>
               <td>{item}</td>
               <td>
+                {/* {these do not work yet} */}
                 <Button variant="outline-warning">Edit</Button>{' '}
                 <Button variant="outline-danger">Remove</Button>
               </td>
@@ -29,4 +30,4 @@ const ExpensesList = ({expenses}) => {
   )
 }
 
-export default ExpensesList;
+export default List;

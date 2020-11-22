@@ -2,25 +2,25 @@ import React, {useState, useEffect} from 'react';
 import Button from 'react-bootstrap/Button';
 import InputGroup from "react-bootstrap/InputGroup";
 import {loadSavedData, saveDataInStorage} from "../renderer.js";
-import ExpensesList from "./ExpensesList";
+import List from "./List";
 const { ipcRenderer } = require("electron");
 const { HANDLE_FETCH_DATA, HANDLE_SAVE_DATA } = require("../../utils/constants")
 
 const Home = () => {
   const [val, setVal] = useState("");
-  const [expenses, setExpenses] = useState([]);
+  const [itemsToTrack, setItems] = useState([]);
 
-  // Grab the user's saved expenses after the app loads
+  // Grab the user's saved itemsToTrack after the app loads
   useEffect(() => {
     loadSavedData();
   }, []);
 
   // Listener functions that receive messages from main
   useEffect(() => {
-    ipcRenderer.on(HANDLE_SAVE_DATA, handleNewExpense);
+    ipcRenderer.on(HANDLE_SAVE_DATA, handleNewItem);
     // If we omit the next step, we will cause a memory leak and & exceed max listeners
     return () => {
-      ipcRenderer.removeListener(HANDLE_SAVE_DATA, handleNewExpense);
+      ipcRenderer.removeListener(HANDLE_SAVE_DATA, handleNewItem);
     }
   });
   useEffect(() => {
@@ -30,16 +30,14 @@ const Home = () => {
     }
   });
 
-  // Receives all user expenses from main
+  // Receives all user itemsToTrack from main
   const handleReceiveData = (event, data) => {
-    // console.log("renderer received data from main:", data.message);
-    setExpenses([...data.message]);
+    setItems([...data.message]);
   };
 
-  // Receives a new expense from main
-  const handleNewExpense = (event, data) => {
-    // console.log("renderer received data from main:", data.message)
-    setExpenses([...expenses, data.message])
+  // Receives a new item back from main
+  const handleNewItem = (event, data) => {
+    setItems([...itemsToTrack, data.message])
   }
 
   // Manage state and input field
@@ -48,7 +46,7 @@ const Home = () => {
   }
 
   // Send the input to main
-  const addExpense = (input) => {
+  const addItem = (input) => {
     saveDataInStorage(input)
     setVal("")
   }
@@ -57,16 +55,14 @@ const Home = () => {
     <div>
       <InputGroup className="mb-3">
         <InputGroup.Prepend>
-          <Button variant="outline-primary" onClick={() => addExpense(val)}>New expense</Button>
+          <Button variant="outline-primary" onClick={() => addItem(val)}>New Item</Button>
         </InputGroup.Prepend>
           <input type="text" onChange={handleChange} value={val}/>
       </InputGroup>
-      {expenses.length ? (
-        <div id="expenses-container">
-        <ExpensesList expenses={expenses} />
-        </div>
+      {itemsToTrack.length ? (
+        <List itemsToTrack={itemsToTrack} />
       ) : (
-        <p>Add an expense to get started</p>
+        <p>Add an item to get started</p>
       )}
     </div>
   )
