@@ -1,6 +1,7 @@
 import React from 'react';
 import Table from "react-bootstrap/Table"
 import Button from "react-bootstrap/Button";
+import {removeDataFromStorage} from "../renderer.js"
 
 const List = ({itemsToTrack}) => {
   return (
@@ -18,9 +19,10 @@ const List = ({itemsToTrack}) => {
               <td>{i+1}</td>
               <td>{item}</td>
               <td>
-                {/* {these do not work yet} */}
-                <Button variant="outline-warning">Edit</Button>{' '}
-                <Button variant="outline-danger">Remove</Button>
+                <Button
+                  variant="outline-danger"
+                  onClick={() => removeDataFromStorage(item)}
+                >Remove</Button>
               </td>
             </tr>
           )

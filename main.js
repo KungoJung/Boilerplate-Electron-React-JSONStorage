@@ -1,10 +1,10 @@
 'use strict';
 
 // Import parts of electron to use
-const { app, Menu, ipcMain, BrowserWindow } = require('electron');
+const { app, ipcMain, BrowserWindow } = require('electron');
 const path = require('path')
 const url = require('url')
-const {HANDLE_FETCH_DATA, FETCH_DATA_FROM_STORAGE, HANDLE_SAVE_DATA, SAVE_DATA_IN_STORAGE} = require("./utils/constants")
+const {HANDLE_FETCH_DATA, FETCH_DATA_FROM_STORAGE, HANDLE_SAVE_DATA, SAVE_DATA_IN_STORAGE, REMOVE_DATA_FROM_STORAGE, HANDLE_REMOVE_DATA} = require("./utils/constants")
 const storage = require("electron-json-storage")
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -22,7 +22,7 @@ if ( process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) 
 
 // Keep a reference to the default path to userData, which will act as the app's database. It may not be necessary to use this
 const defaultDataPath = storage.getDefaultDataPath();
-// On Mac: /Users/[username]/Library/Application Support/expense-tracker-electron/storage
+// On Mac: /Users/[username]/Library/Application Support/[app-name]/storage
 
 function createWindow() {
   // Create the browser window.
@@ -66,44 +66,8 @@ function createWindow() {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
-
-  // Creates a Menu instance (optional)
-  // const menu = Menu.buildFromTemplate([
-  //   {
-  //     label: 'Track',
-  //     submenu: [
-  //       {label: "Current Month"},
-  //       {label: "Past 6 Months"},
-  //       {label: "Past Year"},
-  //       {type: "separator"},
-  //       {
-  //         label: "Link: Monefy",
-  //         click() {
-  //           shell.openExternal('https://monefy.me/')
-  //         }
-  //       },
-  //       {type: "separator"},
-  //       {
-  //         label: "Exit",
-  //         click() {
-  //           app.quit()
-  //         }
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     label: "Info",
-  //     submenu: [
-  //       {label: "this"},
-  //       {label: "that"},
-  //     ]
-  //   }
-  // ])
-//
-  // Appends the menu to the application
-//   Menu.setApplicationMenu(menu)
 }
-// End createWindow() ---------------------------------------------------
+// ---------------------------------------------------
 
 // Application boot up and boot down
 
@@ -135,12 +99,12 @@ app.on('activate', () => {
 
 // Receives a FETCH_DATA_FROM_STORAGE from renderer
 ipcMain.on(FETCH_DATA_FROM_STORAGE, (event, message) => {
+  console.log("Main received: FETCH_DATA_FROM_STORAGE with message:", message)
   // Get the user's itemsToTrack from storage
   // For our purposes, message = itemsToTrack array
   storage.get(message, (error, data) => {
     // if the itemsToTrack key does not yet exist in storage, data returns an empty object, so we will declare itemsToTrack to be an empty array
     itemsToTrack = JSON.stringify(data) === '{}' ? [] : data;
-
     if (error) {
       mainWindow.send(HANDLE_FETCH_DATA, {
         success: false,
@@ -154,16 +118,13 @@ ipcMain.on(FETCH_DATA_FROM_STORAGE, (event, message) => {
       })
     }
   })
-
 })
 
 // Receive a SAVE_DATA_IN_STORAGE call from renderer
 ipcMain.on(SAVE_DATA_IN_STORAGE, (event, message) => {
-  console.log("main received", SAVE_DATA_IN_STORAGE + ": message:", message)
-
+  console.log("Main received: SAVE_DATA_IN_STORAGE")
   // update the itemsToTrack array.
   itemsToTrack.push(message)
-
   // Save itemsToTrack to storage
   storage.set("itemsToTrack", itemsToTrack, (error) => {
     if (error) {
@@ -182,3 +143,25 @@ ipcMain.on(SAVE_DATA_IN_STORAGE, (event, message) => {
   })
 });
 
+// Receive a REMOVE_DATA_FROM_STORAGE call from renderer
+ipcMain.on(REMOVE_DATA_FROM_STORAGE, (event, message) => {
+  console.log('Main Received: REMOVE_DATA_FROM_STORAGE')
+  // Update the items to Track array.
+  itemsToTrack = itemsToTrack.filter(item => item !== message)
+  // Save itemsToTrack to storage
+  storage.set("itemsToTrack", itemsToTrack, (error) => {
+    if (error) {
+      console.log("We errored! What was data?")
+      mainWindow.send(HANDLE_REMOVE_DATA, {
+        success: false,
+        message: "itemsToTrack not saved",
+      })
+    } else {
+      // Send new updated array to window as 2nd arg "data"
+      mainWindow.send(HANDLE_REMOVE_DATA, {
+        success: true,
+        message: itemsToTrack,
+      })
+    }
+  })
+})

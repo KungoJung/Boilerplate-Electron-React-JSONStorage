@@ -4,7 +4,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import {loadSavedData, saveDataInStorage} from "../renderer.js";
 import List from "./List";
 const { ipcRenderer } = require("electron");
-const { HANDLE_FETCH_DATA, HANDLE_SAVE_DATA } = require("../../utils/constants")
+const { HANDLE_FETCH_DATA, HANDLE_SAVE_DATA, HANDLE_REMOVE_DATA } = require("../../utils/constants")
 
 const Home = () => {
   const [val, setVal] = useState("");
@@ -29,8 +29,14 @@ const Home = () => {
       ipcRenderer.removeListener(HANDLE_FETCH_DATA, handleReceiveData);
     }
   });
+  useEffect(() => {
+    ipcRenderer.on(HANDLE_REMOVE_DATA, handleReceiveData);
+    return () => {
+      ipcRenderer.removeListener(HANDLE_REMOVE_DATA, handleReceiveData);
+    }
+  });
 
-  // Receives all user itemsToTrack from main
+  // Receives itemsToTrack from main and sets the state
   const handleReceiveData = (event, data) => {
     setItems([...data.message]);
   };
@@ -57,7 +63,7 @@ const Home = () => {
         <InputGroup.Prepend>
           <Button variant="outline-primary" onClick={() => addItem(val)}>New Item</Button>
         </InputGroup.Prepend>
-          <input type="text" onChange={handleChange} value={val}/>
+        <input type="text" onChange={handleChange} value={val}/>
       </InputGroup>
       {itemsToTrack.length ? (
         <List itemsToTrack={itemsToTrack} />
