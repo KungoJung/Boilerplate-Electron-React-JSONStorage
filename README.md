@@ -1,10 +1,12 @@
-# Electron Expense Tracker
+# Boilerplate-Electron-React-JSONStorage
+A boilerplate for building offline, persistent desktop apps in JavaScript using Electron, React, and Local-JSON-Storage.
 
-### Stackathon Project exploring Electron, Bootstrap, and D3
+The project uses [electron-json-storage](https://github.com/electron-userland/electron-json-storage) to persist basic data structures in JSON.
 
-------------------------------------------------------------------------------------------------------------------------------------------------
+This repo is an extension of [basic-electron-react-boilerplate](https://github.com/keithweaver/basic-electron-react-boilerplate)
+The following comes from that repo:
 
-From the Boilerplate Repo (Electron-React App)
+## Modern and Minimal Electron + React Starter Kit
 
 _Electron, React, Webpack -- Modern and up-to-date, with a handful of quality of life features included_
 
